@@ -13,6 +13,10 @@ export default async function TopicPage({ params }: { params: Promise<{ id: stri
   const item = contentData.find(c => c.id === id)
   
   if (!item) notFound()
+
+  const currentIndex = contentData.findIndex(c => c.id === id)
+  const prevItem = currentIndex > 0 ? contentData[currentIndex - 1] : null
+  const nextItem = currentIndex < contentData.length - 1 ? contentData[currentIndex + 1] : null
   
-  return <TopicDetailView item={item} />
+  return <TopicDetailView item={item} prev={prevItem} next={nextItem} />
 }

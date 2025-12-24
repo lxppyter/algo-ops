@@ -65,18 +65,20 @@ An essential optimization is the \`swapped\` flag. If we go through a full pass 
     const n = arr.length;
     let swapped;
     
+    // Outer loop for each pass
     for (let i = 0; i < n; i++) {
         swapped = false;
-        // Last i elements are already in place
+        // Inner loop: Compare adjacent elements
+        // Last 'i' elements are already sorted, so we reduce range
         for (let j = 0; j < n - i - 1; j++) {
             if (arr[j] > arr[j + 1]) {
-                // Swap
+                // Swap if left > right
                 [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];
                 swapped = true;
             }
         }
-        // Optimization: If no two elements were swapped
-        // by inner loop, then break
+        // Optimization: If no swaps occured in a full pass,
+        // the array is already sorted. Stop early.
         if (!swapped) break;
     }
     return arr;
@@ -144,28 +146,36 @@ En kötü durum \`O(N^2)\` (her seferinde en küçük/büyük elemanı pivot se�
         { en: "Unstable (changes relative order of equals)", tr: "Kararsızdır (eşit elemanların sırasını bozabilir)" }
     ],
     complexity: { time: "Avg: O(N log N), Worst: O(N^2)", space: "O(log N)" },
-    codeSnippet: `function quickSort(arr: number[], left: number = 0, right: number = arr.length - 1): number[] {
+    codeSnippet: `// Main QuickSort Function
+function quickSort(arr: number[], left: number = 0, right: number = arr.length - 1): number[] {
     if (left < right) {
+        // 1. Partition the array and get pivot index
         const pivotIndex = partition(arr, left, right);
+        
+        // 2. Recursively sort elements before partition
         quickSort(arr, left, pivotIndex - 1);
+        
+        // 3. Recursively sort elements after partition
         quickSort(arr, pivotIndex + 1, right);
     }
     return arr;
 }
 
+// Partition Logic (Lomuto Partition Scheme)
 function partition(arr: number[], left: number, right: number): number {
-    const pivot = arr[right]; // Choosing last element as pivot
-    let i = left - 1; // Index of smaller element
+    const pivot = arr[right]; // Choose last element as pivot
+    let i = left - 1; // Index for smaller element
 
     for (let j = left; j < right; j++) {
+        // If current element is smaller than pivot
         if (arr[j] < pivot) {
-            i++;
+            i++; // Move smaller element index forward
             [arr[i], arr[j]] = [arr[j], arr[i]]; // Swap
         }
     }
-    // Place pivot in correct position
+    // Place pivot in correct position (after all smaller elements)
     [arr[i + 1], arr[right]] = [arr[right], arr[i + 1]];
-    return i + 1;
+    return i + 1; // Return pivot index
 }`,
     questions: [
         { id: 905, title: "Sort Array By Parity", difficulty: "Easy", url: "https://leetcode.com/problems/sort-array-by-parity/" },
@@ -249,15 +259,15 @@ It takes only ~20 steps to find anything in 1 million items.`,
     let right = arr.length - 1;
 
     while (left <= right) {
-        // Prevent overflow with bitwise shift or explicit logic
+        // Calculate mid safely (avoid overflow)
         const mid = Math.floor((left + right) / 2);
 
         if (arr[mid] === target) {
-            return mid; // Found
+            return mid; // Found the target
         } else if (arr[mid] < target) {
-            left = mid + 1; // Search Right
+            left = mid + 1; // Target is in the Right half
         } else {
-            right = mid - 1; // Search Left
+            right = mid - 1; // Target is in the Left half
         }
     }
     return -1; // Not found
@@ -329,29 +339,36 @@ Grafların aksine, Ağaçlarda (genelde) döngü olmaz. Bu yüzden sadece ebevey
         { en: "Recursion depth limit in DFS", tr: "DFS'de özyineleme derinlik limiti (Stack Overflow)" }
     ],
     complexity: { time: "O(N)", space: "O(N) (Recursion Stack or Queue)" },
-    codeSnippet: `// 1. Pre-Order (Root, Left, Right)
+    codeSnippet: `// 1. Pre-Order (Visit Root FIRST)
+// Used for: Copying trees, prefix expression evaluation
 function preOrder(node: TreeNode | null) {
     if (!node) return;
-    console.log(node.val);
-    preOrder(node.left);
-    preOrder(node.right);
+    console.log(node.val); // Process Root
+    preOrder(node.left);   // Then Left
+    preOrder(node.right);  // Then Right
 }
 
-// 2. In-Order (Left, Root, Right) -> Sorts BST!
+// 2. In-Order (Visit Root BETWEEN)
+// Used for: Getting sorted values from BST
 function inOrder(node: TreeNode | null) {
     if (!node) return;
-    inOrder(node.left);
-    console.log(node.val);
-    inOrder(node.right);
+    inOrder(node.left);    // Left
+    console.log(node.val); // Root
+    inOrder(node.right);   // Right
 }
 
 // 3. Level-Order (BFS)
+// Used for: Finding shortest path (unweighted), serializing tree
 function levelOrder(root: TreeNode | null) {
     if (!root) return;
-    const queue = [root];
+    const queue = [root]; // Start with root
+    
     while (queue.length > 0) {
+        // Dequeue first element
         const node = queue.shift()!;
         console.log(node.val);
+        
+        // Enqueue children (if they exist)
         if (node.left) queue.push(node.left);
         if (node.right) queue.push(node.right);
     }
@@ -419,10 +436,11 @@ Ziyaret edilen düğümleri bir \`Set\` veya dizi içinde tutmalıyız. Bir dü�
         { en: "More complex than Tree traversal", tr: "Ağaç gezintisinden daha karmaşıktır" }
     ],
     complexity: { time: "O(V + E)", space: "O(V)" },
-    codeSnippet: `// BFS (Graph)
+    codeSnippet: `// BFS (Breadth-First Search) - Shortest Path in Unweighted Graph
 function bfs(start: string, graph: any) {
     const queue = [start];
-    const visited = new Set([start]); // Critical!
+    // VISITED Set is crucial to prevent infinite loops in cycles
+    const visited = new Set([start]); 
 
     while(queue.length > 0) {
         const node = queue.shift();
@@ -430,22 +448,23 @@ function bfs(start: string, graph: any) {
 
         for(const neighbor of graph[node]) {
             if(!visited.has(neighbor)) {
-                visited.add(neighbor); // Mark as seen
+                visited.add(neighbor); // Mark as soon as we see it
                 queue.push(neighbor);
             }
         }
     }
 }
 
-// DFS (Graph - Recursive)
+// DFS (Depth-First Search) - Recursive
+// Good for: Path existence, Cycle detection
 function dfs(node: string, graph: any, visited = new Set()) {
-    if(visited.has(node)) return;
+    if(visited.has(node)) return; // Base case for cycles
     
-    visited.add(node); // Mark as seen
+    visited.add(node);
     console.log(node);
 
     for(const neighbor of graph[node]) {
-        dfs(neighbor, graph, visited);
+        dfs(neighbor, graph, visited); // Recurse deep
     }
 }`,
     questions: [
@@ -518,25 +537,33 @@ Bu aslında BFS gibidir, ancak normal Queue yerine Priority Queue kullanarak her
     ],
     complexity: { time: "O(E log V)", space: "O(V + E)" },
     codeSnippet: `function dijkstra(graph: Graph, start: string) {
+    // Distance table: tracks shortest known distance to each node
     const distances = {};
-    const pq = new PriorityQueue(); // Custom class assumed
+    const pq = new PriorityQueue(); // Custom MQ required
 
-    // Init
+    // 1. Initialize all as Infinity
     for (let node in graph) distances[node] = Infinity;
     distances[start] = 0;
+    
+    // 2. Add Start to Priority Queue
     pq.enqueue(start, 0);
 
     while (!pq.isEmpty()) {
+        // 3. Get the node with the SMALLEST distance (Greedy)
         const { node: u, priority: d } = pq.dequeue();
 
-        if (d > distances[u]) continue; // Skip outdated paths
+        // Optimization: If we found a shorter way to 'u' already, skip
+        if (d > distances[u]) continue;
 
+        // 4. Relax Edges (Check neighbors)
         for (let neighbor in graph[u]) {
             let weight = graph[u][neighbor];
             let newDist = d + weight;
 
+            // If found a shorter path to neighbor, update it
             if (newDist < distances[neighbor]) {
                 distances[neighbor] = newDist;
+                // Add to PQ to explore its neighbors later
                 pq.enqueue(neighbor, newDist);
             }
         }
@@ -554,7 +581,7 @@ Bu aslında BFS gibidir, ancak normal Queue yerine Priority Queue kullanarak her
   },
   {
     id: "algo-dp-climbing-stairs",
-    title: { en: "DP: Climbing Stairs", tr: "DP: Climbing Stairs" },
+    title: { en: "Dynamic Programming: Climbing Stairs", tr: "Dinamik Programlama: Climbing Stairs" },
     category: "Algorithm",
     domain: "DSA",
     level: "Mid",
@@ -612,16 +639,17 @@ Bu mantık, üstel O(2^N) olan özyineleme ağacını lineer O(N) bir döngüye 
         { en: "Hard to formulate recurrence relation", tr: "Tekrarlama ilişkisini formüle etmek zordur" }
     ],
     complexity: { time: "O(N)", space: "O(1)" },
-    codeSnippet: `function climbStairs(n: number): number {
-    if (n <= 2) return n;
+    codeSnippet: `// Climbing Stairs (DP Bottom-Up)
+function climbStairs(n: number): number {
+    if (n <= 2) return n; // Base cases: 1->1, 2->2
 
-    // We only need the last two values, not whole array
-    // Space Optimization O(1)
-    let oneStepBefore = 2;
-    let twoStepsBefore = 1;
+    // We only need the last two values, not whole array (Space Optimization)
+    let oneStepBefore = 2; // dp[i-1]
+    let twoStepsBefore = 1; // dp[i-2]
     let allWays = 0;
 
     for (let i = 3; i <= n; i++) {
+        // Recurrence: ways(i) = ways(i-1) + ways(i-2)
         allWays = oneStepBefore + twoStepsBefore;
         
         // Shift values for next iteration
@@ -686,15 +714,18 @@ Selection Sort (Seçmeli Sıralama), basit bir karşılaştırma tabanlı algori
     complexity: { time: "O(N^2)", space: "O(1)" },
     codeSnippet: `function selectionSort(arr: number[]): number[] {
     const n = arr.length;
+    // Iterate through unsorted portion
     for (let i = 0; i < n; i++) {
-        let minIdx = i;
-        // Find min in unsorted array
+        let minIdx = i; // Assume current is min
+        
+        // Find absolute minimum in the remaining unsorted array
         for (let j = i + 1; j < n; j++) {
             if (arr[j] < arr[minIdx]) {
-                minIdx = j;
+                minIdx = j; // Update min index
             }
         }
-        // Swap found minimum with first element
+        
+        // Swap found minimum with the first unsorted element
         if (minIdx !== i) {
             [arr[i], arr[minIdx]] = [arr[minIdx], arr[i]];
         }
@@ -760,31 +791,41 @@ Heap Sort (Yığın Sıralaması), Binary Heap veri yapısına dayalı karşıla
     codeSnippet: `function heapSort(arr: number[]): number[] {
     const n = arr.length;
 
-    // Build Max Heap
+    // 1. Build Max Heap (Rearrange array)
+    // Start from last non-leaf node and go up
     for (let i = Math.floor(n / 2) - 1; i >= 0; i--) {
         heapify(arr, n, i);
     }
 
-    // Extract elements
+    // 2. Extract elements one by one
     for (let i = n - 1; i > 0; i--) {
-        // Move current root to end
+        // Move current root (Largest) to the end (sorted region)
         [arr[0], arr[i]] = [arr[i], arr[0]];
-        // Call max heapify on reduced heap
+        
+        // Call max heapify on the reduced heap (size i)
         heapify(arr, i, 0);
     }
     return arr;
 }
 
+// To heapify a subtree rooted with node i which is an index in arr[]. 
+// n is size of heap
 function heapify(arr: number[], n: number, i: number) {
-    let largest = i;
-    const l = 2 * i + 1;
-    const r = 2 * i + 2;
+    let largest = i; // Initialize largest as root
+    const l = 2 * i + 1; // Left child
+    const r = 2 * i + 2; // Right child
 
+    // If left child is larger than root
     if (l < n && arr[l] > arr[largest]) largest = l;
+
+    // If right child is larger than largest so far
     if (r < n && arr[r] > arr[largest]) largest = r;
 
+    // If largest is not root
     if (largest !== i) {
-        [arr[i], arr[largest]] = [arr[largest], arr[i]];
+        [arr[i], arr[largest]] = [arr[largest], arr[i]]; // Swap
+        
+        // Recursively heapify the affected sub-tree
         heapify(arr, n, largest);
     }
 }`,
@@ -842,20 +883,25 @@ Merge Sort (Birleştirmeli Sıralama), bir "Böl ve Yönet" algoritmasıdır. Gi
 - **Alan**: **O(N)**. Elemanları birleştirmek için geçici bir diziye ihtiyacımız var.`
     },
     complexity: { time: "O(N log N)", space: "O(N)" },
-    codeSnippet: `function mergeSort(arr: number[]): number[] {
+    codeSnippet: `// Main MergeSort Function (Recursive)
+function mergeSort(arr: number[]): number[] {
+    // Base case: Array of 0 or 1 element is sorted
     if (arr.length <= 1) return arr;
 
+    // Divide
     const mid = Math.floor(arr.length / 2);
-    const left = mergeSort(arr.slice(0, mid));
-    const right = mergeSort(arr.slice(mid));
+    const left = mergeSort(arr.slice(0, mid)); // Sort Left
+    const right = mergeSort(arr.slice(mid));   // Sort Right
 
+    // Conquer & Combine
     return merge(left, right);
 }
 
+// Merge Helper: Zipper Logic
 function merge(left: number[], right: number[]): number[] {
     let resultArray: number[] = [], leftIndex = 0, rightIndex = 0;
 
-    // Concatenate values into resultArray
+    // Compare elements from both lists and pick smaller
     while (leftIndex < left.length && rightIndex < right.length) {
         if (left[leftIndex] < right[rightIndex]) {
             resultArray.push(left[leftIndex]);
@@ -866,6 +912,7 @@ function merge(left: number[], right: number[]): number[] {
         }
     }
 
+    // Concatenate remaining elements (if any)
     return resultArray
             .concat(left.slice(leftIndex))
             .concat(right.slice(rightIndex));
@@ -945,12 +992,16 @@ Bellman-Ford, tek bir kaynak düğümden diğer tüm düğümlere en kısa yolla
     for(let node in graph) distances[node] = Infinity;
     distances[start] = 0;
 
-    // 2. Relax Edges V-1 times
     const nodes = Object.keys(graph);
+    
+    // 2. Relax Edges V-1 times
+    // We do this loop V-1 times because in worst case (line graph),
+    // info takes V-1 steps to travel from start to end.
     for(let i=0; i < nodes.length - 1; i++) {
         for(let u of nodes) {
             for(let v in graph[u]) {
                 const weight = graph[u][v];
+                // Relaxation check
                 if(distances[u] + weight < distances[v]) {
                     distances[v] = distances[u] + weight;
                 }
@@ -959,6 +1010,8 @@ Bellman-Ford, tek bir kaynak düğümden diğer tüm düğümlere en kısa yolla
     }
 
     // 3. Check Negative Cycles
+    // If we can STILL reduce distance after V-1 loops, 
+    // there must be a cycle that reduces total weight forever.
     for(let u of nodes) {
          for(let v in graph[u]) {
              if(distances[u] + graph[u][v] < distances[v]) {
@@ -1042,29 +1095,32 @@ Prim Algoritması, ağırlıklı yönsüz bir graf için Minimum Kapsayan Ağaç
     codeSnippet: `function prim(graph: number[][]): number {
     // Simplified Adjacency Matrix implementation
     const n = graph.length;
-    let parent = [];
-    let key = new Array(n).fill(Infinity);
-    let mstSet = new Array(n).fill(false);
+    let key = new Array(n).fill(Infinity); // Min weight to connect i
+    let mstSet = new Array(n).fill(false); // Included in MST?
 
-    // Initial node
+    // Initial node (0)
     key[0] = 0;
-    parent[0] = -1;
 
     for (let count = 0; count < n - 1; count++) {
-        // Pick min key vertex
+        // 1. Pick min key vertex not yet in MST
         let u = minKey(key, mstSet, n); 
-        mstSet[u] = true;
+        mstSet[u] = true; // Include it
 
+        // 2. Update key value of adjacent vertices
         for (let v = 0; v < n; v++) {
+            // Update key if:
+            // - edge exists
+            // - v is not in MST
+            // - weight is smaller than current key
             if (graph[u][v] && !mstSet[v] && graph[u][v] < key[v]) {
-                parent[v] = u;
-                key[v] = graph[u][v];
+                key[v] = graph[u][v]; // Update with cheaper connection
             }
         }
     }
-    return key.reduce((a,b) => a+b, 0); // Total Weight
+    return key.reduce((a,b) => a+b, 0); // Total Weight of MST
 }
-// Helper to find min key index
+
+// Helper to find min key index (Greedy Step)
 function minKey(key, mstSet, n) {
     let min = Infinity, minIndex = -1;
     for(let v=0; v<n; v++)
@@ -1140,19 +1196,25 @@ Kruskal Algoritması, her düğümü ayrı bir ağaç (orman) olarak ele alıp, 
         { en: "Requires disjoint-set data structure", tr: "Ayrık küme veri yapısı gerektirir" }
     ],
     complexity: { time: "O(E log E)", space: "O(V + E)" },
-    codeSnippet: `// Kruskal uses Union-Find + Edge Sorting
+    codeSnippet: `// Kruskal uses Union-Find + Edge Sorting to find MST
 function kruskal(numVertices: number, edges: number[][]) {
-    // Edge: [src, dest, weight]
-    // 1. Sort edges by weight
+    // Edge format: [src, dest, weight]
+    
+    // 1. Sort edges by weight (Ascending)
+    // Greedy approach: always try to add the cheapest edge
     edges.sort((a,b) => a[2] - b[2]);
 
+    // Union-Find (Disjoint Set) initialization
+    // Initially, each vertex is its own parent (own set)
     const parent = Array(numVertices).fill(0).map((_,i) => i);
     
+    // Find with Path Compression
     function find(i) {
         if(parent[i] == i) return i;
         return find(parent[i]);
     }
     
+    // Union logic
     function union(i, j) {
         const rootI = find(i);
         const rootJ = find(j);
@@ -1164,9 +1226,11 @@ function kruskal(numVertices: number, edges: number[][]) {
 
     for(let edge of edges) {
         let [u, v, w] = edge;
+        
+        // 2. Check Cycle: If u and v are in different sets
         if(find(u) !== find(v)) {
-            union(u, v);
-            mstWeight += w;
+            union(u, v);     // Merge sets
+            mstWeight += w;  // Add cost
             edgesCount++;
         }
     }
@@ -1242,28 +1306,93 @@ A* (A-Star), yol bulma için kullanılan bilgilendirilmiş bir arama algoritmas�
     ],
     complexity: { time: "O(E)", space: "O(V)" },
     codeSnippet: `// A* Concept (Heuristic Search)
-function aStar(start, goal) {
-    // Priority Queue stores (f_score, node)
-    // f(n) = g(n) + h(n)
-    // g(n): cost from start
-    // h(n): estimated cost to goal (Heuristic)
+// f(n) = g(n) + h(n)
+function aStar(grid: number[][], start: [number, number], goal: [number, number]): [number, number][] | null {
+    const rows = grid.length;
+    const cols = grid[0].length;
     
-    // openSet = [start]
-    // gScore[start] = 0
-    // fScore[start] = heuristic(start, goal)
+    // Directions: Up, Down, Left, Right
+    const dirs = [[-1, 0], [1, 0], [0, -1], [0, 1]];
+
+    // Priority Queue substitute (We sort array by fScore each iteration)
+    // Node structure: [row, col, fScore, gScore]
+    const openSet: {r: number, c: number, f: number, g: number}[] = [];
     
-    // while openSet not empty:
-    //    current = node with lowest fScore
-    //    if current == goal: return path
+    // Map to track path: Key="r,c" -> Value={r,c} (Parent)
+    const cameFrom = new Map<string, {r: number, c: number}>();
     
-    //    for neighbor of current:
-    //        tentative_g = gScore[current] + d(current, neighbor)
-    //        if tentative_g < gScore[neighbor]:
-    //            gScore[neighbor] = tentative_g
-    //            fScore[neighbor] = gScore[neighbor] + h(neighbor)
-    //            if neighbor not in openSet: add to It
+    // Cost from start to current node
+    const gScore = new Map<string, number>();
     
-    return "See detailed pathfinding impl";
+    const startKey = \`\${start[0]},\${start[1]}\`;
+    gScore.set(startKey, 0); // Cost to start is 0
+    
+    // Add start node
+    openSet.push({ 
+        r: start[0], 
+        c: start[1], 
+        f: heuristic(start, goal), // Estimated total cost
+        g: 0 
+    });
+
+    while (openSet.length > 0) {
+        // 1. Get node with LOWEST fScore
+        openSet.sort((a, b) => a.f - b.f);
+        const current = openSet.shift()!;
+        
+        // 2. Goal check
+        if (current.r === goal[0] && current.c === goal[1]) {
+            return reconstructPath(cameFrom, current.r, current.c);
+        }
+
+        const currentKey = \`\${current.r},\${current.c}\`;
+
+        // 3. Explore Neighbors
+        for (const [dr, dc] of dirs) {
+            const nr = current.r + dr;
+            const nc = current.c + dc;
+
+            // Boundary and Wall check (0=Walkable, 1=Wall)
+            if (nr >= 0 && nr < rows && nc >= 0 && nc < cols && grid[nr][nc] === 0) {
+                
+                const tentative_g = current.g + 1; // Distance logic (1 per step)
+                const neighborKey = \`\${nr},\${nc}\`;
+
+                // If path is better than any previous one
+                if (tentative_g < (gScore.get(neighborKey) ?? Infinity)) {
+                    // Record path
+                    cameFrom.set(neighborKey, { r: current.r, c: current.c });
+                    gScore.set(neighborKey, tentative_g);
+                    
+                    // f = g + h
+                    const f = tentative_g + heuristic([nr, nc], goal);
+                    
+                    // Add to Open Set
+                    // In a real PQ, we would update priority if exists, but push is simpler here
+                    openSet.push({ r: nr, c: nc, f, g: tentative_g });
+                }
+            }
+        }
+    }
+    return null; // No path found
+}
+
+// Manhattan Distance Heuristic (for Grid)
+function heuristic(a: [number, number], b: [number, number]): number {
+    return Math.abs(a[0] - b[0]) + Math.abs(a[1] - b[1]);
+}
+
+// Backtrack from Goal to Start to rebuild path
+function reconstructPath(cameFrom: Map<string, {r: number, c: number}>, r: number, c: number) {
+    const path: [number, number][] = [[r, c]];
+    let key = \`\${r},\${c}\`;
+    
+    while (cameFrom.has(key)) {
+        const parent = cameFrom.get(key)!;
+        path.unshift([parent.r, parent.c]);
+        key = \`\${parent.r},\${parent.c}\`;
+    }
+    return path;
 }`,
     questions: [
         { id: 821, title: "Shortest Distance to a Character", difficulty: "Easy", url: "https://leetcode.com/problems/shortest-distance-to-a-character/" },

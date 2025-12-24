@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { motion, AnimatePresence } from "framer-motion"
-import { ExternalLink, Clock, HardDrive, Code as CodeIcon, BookOpen, Sparkles, Check, ChevronRight, Copy } from "lucide-react"
+import { ExternalLink, Clock, HardDrive, Code as CodeIcon, BookOpen, Sparkles, Check, ChevronRight, Copy, ChevronLeft } from "lucide-react"
 import Link from "next/link"
 import ReactMarkdown from "react-markdown"
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
@@ -14,7 +14,7 @@ import { atomDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { useState } from "react"
 import { cn } from "@/lib/utils"
 
-export function TopicDetailView({ item }: { item: ContentItem }) {
+export function TopicDetailView({ item, prev, next }: { item: ContentItem, prev?: ContentItem | null, next?: ContentItem | null }) {
   const { mode, language } = useExplanation()
   const [copied, setCopied] = useState(false)
   
@@ -28,19 +28,64 @@ export function TopicDetailView({ item }: { item: ContentItem }) {
   }
 
   return (
-    <div className="min-h-screen bg-background animate-in fade-in duration-500">
+    <div className="min-h-screen bg-background animate-in fade-in duration-500 relative">
+      {/* Navigation Arrows (Desktop) */}
+      {prev && (
+        <Link 
+            href={`/topics/${prev.id}`}
+            className="hidden xl:flex fixed left-6 top-1/2 -translate-y-1/2 z-30 flex-col items-center gap-2 group text-muted-foreground hover:text-foreground transition-all duration-300"
+        >
+            <div className="p-3 rounded-full bg-background/80 backdrop-blur border shadow-sm group-hover:shadow-md group-hover:scale-110 transition-all">
+                <ChevronLeft className="w-8 h-8" />
+            </div>
+            <span className="text-xs font-semibold max-w-[100px] text-center opacity-0 group-hover:opacity-100 transition-opacity absolute top-full mt-2 bg-popover px-2 py-1 rounded shadow text-popover-foreground pointer-events-none">
+                {prev.title[language]}
+            </span>
+        </Link>
+      )}
+
+      {next && (
+        <Link 
+            href={`/topics/${next.id}`}
+            className="hidden xl:flex fixed right-6 top-1/2 -translate-y-1/2 z-30 flex-col items-center gap-2 group text-muted-foreground hover:text-foreground transition-all duration-300"
+        >
+            <div className="p-3 rounded-full bg-background/80 backdrop-blur border shadow-sm group-hover:shadow-md group-hover:scale-110 transition-all">
+                <ChevronRight className="w-8 h-8" />
+            </div>
+             <span className="text-xs font-semibold max-w-[100px] text-center opacity-0 group-hover:opacity-100 transition-opacity absolute top-full mt-2 bg-popover px-2 py-1 rounded shadow text-popover-foreground pointer-events-none">
+                {next.title[language]}
+            </span>
+        </Link>
+      )}
+
       {/* Top Navigation Bar for Context */}
       <div className="sticky top-16 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-         <div className="container flex h-14 items-center gap-4 px-4">
-             <Link href="/" className="text-muted-foreground hover:text-foreground transition-colors">
-                {language === 'tr' ? '← Ana Sayfa' : '← Home'}
-             </Link>
-             <div className="h-4 w-px bg-border" />
-             <div className="flex items-center gap-2">
-                 <span className="font-semibold">{item.title[language]}</span>
-                 <Badge variant={item.domain === 'DSA' ? 'default' : 'secondary'} className="text-xs">
-                    {item.domain}
-                 </Badge>
+         <div className="container flex h-14 items-center justify-between px-4">
+             <div className="flex items-center gap-4">
+                 <Link href="/" className="text-muted-foreground hover:text-foreground transition-colors">
+                    {language === 'tr' ? '← Ana Sayfa' : '← Home'}
+                 </Link>
+                 <div className="h-4 w-px bg-border" />
+                 <div className="flex items-center gap-2">
+                     <span className="font-semibold">{item.title[language]}</span>
+                     <Badge variant={item.domain === 'DSA' ? 'default' : 'secondary'} className="text-xs">
+                        {item.domain}
+                     </Badge>
+                 </div>
+             </div>
+             
+             {/* Mobile/Tablet Simple Nav in Header */}
+             <div className="flex items-center gap-2 xl:hidden">
+                {prev && (
+                    <Link href={`/topics/${prev.id}`} className="p-2 hover:bg-secondary rounded-full transition-colors" title={prev.title[language]}>
+                        <ChevronLeft className="w-5 h-5 text-muted-foreground" />
+                    </Link>
+                )}
+                {next && (
+                     <Link href={`/topics/${next.id}`} className="p-2 hover:bg-secondary rounded-full transition-colors" title={next.title[language]}>
+                        <ChevronRight className="w-5 h-5 text-muted-foreground" />
+                    </Link>
+                )}
              </div>
          </div>
       </div>
@@ -59,10 +104,10 @@ export function TopicDetailView({ item }: { item: ContentItem }) {
                         {item.title[language]}
                     </h1>
                     <div className="flex gap-4 text-sm font-mono text-muted-foreground">
-                        <span className="flex items-center gap-1.5 bg-secondary/30 px-2 py-1 rounded border border-secondary">
+                        <span className="flex items-center gap-1.5 bg-secondary/30 px-2 py-1 rounded border border-secondary uppercase" lang="en">
                             <Clock className="w-4 h-4" /> {item.complexity.time}
                         </span>
-                        <span className="flex items-center gap-1.5 bg-secondary/30 px-2 py-1 rounded border border-secondary">
+                        <span className="flex items-center gap-1.5 bg-secondary/30 px-2 py-1 rounded border border-secondary uppercase" lang="en">
                             <HardDrive className="w-4 h-4" /> {item.complexity.space}
                         </span>
                     </div>
@@ -180,6 +225,23 @@ export function TopicDetailView({ item }: { item: ContentItem }) {
                         </div>
                      </div>
                  )}
+
+                 {/* Mobile Navigation Footer (Visible only on mobile/tablet) */}
+                 <div className="flex items-center justify-between gap-4 pt-8 xl:hidden border-t">
+                    {prev ? (
+                        <Link href={`/topics/${prev.id}`} className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors">
+                            <ChevronLeft className="w-4 h-4" />
+                            <span className="text-sm font-medium">{prev.title[language]}</span>
+                        </Link>
+                    ) : <div />}
+                    
+                    {next && (
+                        <Link href={`/topics/${next.id}`} className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors text-right">
+                             <span className="text-sm font-medium">{next.title[language]}</span>
+                             <ChevronRight className="w-4 h-4" />
+                        </Link>
+                    )}
+                 </div>
             </div>
 
             {/* RIGHT COLUMN: Code & Practice (Sticky) - Hidden for DBA */}
@@ -194,7 +256,7 @@ export function TopicDetailView({ item }: { item: ContentItem }) {
                             {language === 'tr' ? 'Uygulama' : 'Implementation'}
                         </h3>
                          <div className="flex items-center gap-2">
-                             <Badge variant="outline" className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                             <Badge variant="outline" lang="en" className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
                                 TypeScript
                             </Badge>
                              <Button variant="ghost" size="icon" className="h-6 w-6" onClick={handleCopy}>

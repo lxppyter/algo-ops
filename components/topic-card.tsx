@@ -35,7 +35,7 @@ export function TopicCard({ item }: { item: ContentItem }) {
                     </Badge>
                 )}
             </div>
-            <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold flex gap-3">
+            <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold flex gap-3" lang="en">
                 <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {item.complexity.time}</span>
                 <span className="flex items-center gap-1"><HardDrive className="w-3 h-3" /> {item.complexity.space}</span>
             </div>

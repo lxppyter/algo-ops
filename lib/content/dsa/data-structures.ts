@@ -80,10 +80,11 @@ Bir dinamik dizi oluşturduğunuzda, küçük ve sabit bir blok (örn: boyut 4) 
         return this.data[index];
     }
 
+    // O(1) Amortized: Add to end
     push(item: T): void {
         // 1. Check if array needs resizing
         if (this.length === this.capacity) {
-            this.resize(this.capacity * 2);
+            this.resize(this.capacity * 2); // Double capacity
         }
         // 2. Insert item
         this.data[this.length] = item;
@@ -172,36 +173,44 @@ Bağlı listeler ekleme ve silme işlemlerinde mükemmeldir. Bir dizide en başa
     complexity: { time: "Access: O(N), Insert: O(1)", space: "O(N)" },
     codeSnippet: `class Node<T> {
     value: T;
-    next: Node<T> | null = null;
+    next: Node<T> | null = null; // Pointer to the next node
     constructor(val: T) { this.value = val; }
 }
 
 class LinkedList<T> {
-    head: Node<T> | null = null;
-    tail: Node<T> | null = null;
+    head: Node<T> | null = null; // Entry point
+    tail: Node<T> | null = null; // Last node (optimization for append)
 
+    // O(1) - Add to the end
     append(value: T): void {
         const newNode = new Node(value);
         if (!this.tail) {
+            // If list empty, new node is both head and tail
             this.head = newNode;
             this.tail = newNode;
             return;
         }
+        // Link current tail to new node
         this.tail.next = newNode;
+        // Update tail pointer
         this.tail = newNode;
     }
 
+    // O(1) - Add to the front
     prepend(value: T): void {
         const newNode = new Node(value);
         if (!this.head) {
             this.head = newNode;
             this.tail = newNode;
         } else {
+            // New node points to current head
             newNode.next = this.head;
+            // Update head to be new node
             this.head = newNode;
         }
     }
 
+    // O(N) - Search linearly
     find(value: T): Node<T> | null {
         let current = this.head;
         while (current) {
@@ -211,19 +220,24 @@ class LinkedList<T> {
         return null;
     }
 
+    // O(N) - Find and remove
     delete(value: T): void {
         if (!this.head) return;
 
+        // Case 1: Removing the head
         if (this.head.value === value) {
             this.head = this.head.next;
-            if (!this.head) this.tail = null;
+            if (!this.head) this.tail = null; // List became empty
             return;
         }
 
+        // Case 2: Search for node to remove
         let current = this.head;
         while (current.next) {
             if (current.next.value === value) {
+                // Bypass the node to be deleted
                 current.next = current.next.next;
+                // If we deleted last node, update tail
                 if (!current.next) this.tail = current;
                 return;
             }
@@ -305,27 +319,30 @@ Yığınlar bilgisayarların çalışma mantığının temelidir. Her fonksiyon 
 }
 
 class Stack<T> {
-    private top: Node<T> | null = null;
+    private top: Node<T> | null = null; // Pointer to the top element
     size: number = 0;
 
+    // O(1) Push: Add to top
     push(val: T): void {
         const newNode = new Node(val);
-        // New node points to current top
+        // Link new node to current top
         newNode.next = this.top;
-        // Top becomes new node
+        // Update top pointer to be the new node
         this.top = newNode;
         this.size++;
     }
 
+    // O(1) Pop: Remove from top
     pop(): T | null {
-        if (!this.top) return null;
+        if (!this.top) return null; // Stack is empty
         const val = this.top.value;
-        // Move top pointer down
+        // Move top pointer down to the next node
         this.top = this.top.next;
         this.size--;
         return val;
     }
     
+    // O(1) Peek: View top without removing
     peek(): T | null {
         return this.top ? this.top.value : null;
     }
@@ -409,24 +426,31 @@ Hiçbir kaydırma işlemi gerekmez!`
 }
 
 class Queue<T> {
-    private head: Node<T> | null = null;
-    private tail: Node<T> | null = null;
+    private head: Node<T> | null = null; // Remove from here (Oldest)
+    private tail: Node<T> | null = null; // Add to here (Newest)
 
+    // O(1) Enqueue: Add to back
     enqueue(val: T): void {
         const newNode = new Node(val);
         if (!this.tail) {
+            // Empty queue: Head and Tail are the same
             this.head = newNode;
             this.tail = newNode;
         } else {
+            // Link current tail to new node
             this.tail.next = newNode;
+            // Update tail pointer
             this.tail = newNode;
         }
     }
 
+    // O(1) Dequeue: Remove from front
     dequeue(): T | null {
         if (!this.head) return null;
         const val = this.head.value;
+        // Move head pointer to next node
         this.head = this.head.next;
+        // If queue became empty, update tail too
         if (!this.head) this.tail = null;
         return val;
     }
@@ -502,49 +526,56 @@ Bunu **Zincirleme (Separate Chaining)** ile çözeriz:
     complexity: { time: "Avg: O(1), Worst: O(N)", space: "O(N)" },
     codeSnippet: `class HashTable {
     size: number;
-    buckets: Array<Array<[string, any]>>;
+    buckets: Array<Array<[string, any]>>; // Array of arrays (Chaining)
 
     constructor(size = 50) {
         this.size = size;
+        // Initialize with empty arrays to prevent undefined errors
         this.buckets = new Array(size).fill(null).map(() => []);
     }
 
+    // Hash Function: Converts string key -> index number
     private _hash(key: string): number {
         let hash = 0;
         for (let i = 0; i < key.length; i++) {
+            // Simple polynomial rolling hash
             hash = (hash + key.charCodeAt(i) * i) % this.size;
         }
         return hash;
     }
 
+    // O(1) Average: Insert or Update
     set(key: string, value: any) {
         const index = this._hash(key);
         const bucket = this.buckets[index];
         
-        // Check update
+        // Check if key exists (Update)
         for(let i=0; i<bucket.length; i++) {
             if(bucket[i][0] === key) {
-                bucket[i][1] = value;
+                bucket[i][1] = value; // Update existing
                 return;
             }
         }
-        // Collision: Add to bucket chain
+        // Key not found, append (Collision handling)
         bucket.push([key, value]);
     }
 
+    // O(1) Average: Retrieve
     get(key: string): any {
         const index = this._hash(key);
         const bucket = this.buckets[index];
+        // Linear search within the bucket (usually small)
         for(let item of bucket) {
             if(item[0] === key) return item[1];
         }
         return undefined;
     }
 
+    // O(1) Average: Delete
     remove(key: string) {
         const index = this._hash(key);
         const bucket = this.buckets[index];
-        // Filter out the item
+        // Filter out the item to delete it
         this.buckets[index] = bucket.filter(item => item[0] !== key);
     }
 }`,
@@ -629,10 +660,48 @@ Dizilerin (lineer) aksine, ağaçlar farklı şekillerde gezilebilir:
     constructor(val: number) { this.val = val; }
 }
 
-const root = new TreeNode(1);
-root.left = new TreeNode(2);
-root.right = new TreeNode(3);
-root.left.left = new TreeNode(4);`,
+class BinaryTree {
+    root: TreeNode | null = null;
+
+    constructor(rootVal: number) {
+        this.root = new TreeNode(rootVal);
+    }
+
+    // 1. Pre-Order (Root -> Left -> Right)
+    // Useful for copying a tree structure
+    preOrder(node: TreeNode | null, result: number[] = []): number[] {
+        if (!node) return result;
+        result.push(node.val); // Visit Root
+        this.preOrder(node.left, result); // Traverse Left
+        this.preOrder(node.right, result); // Traverse Right
+        return result;
+    }
+
+    // 2. In-Order (Left -> Root -> Right)
+    // Produces sorted output for BSTs
+    inOrder(node: TreeNode | null, result: number[] = []): number[] {
+        if (!node) return result;
+        this.inOrder(node.left, result); // Traverse Left
+        result.push(node.val); // Visit Root
+        this.inOrder(node.right, result); // Traverse Right
+        return result;
+    }
+
+    // 3. Post-Order (Left -> Right -> Root)
+    // Useful for deleting a tree (delete children before parent)
+    postOrder(node: TreeNode | null, result: number[] = []): number[] {
+        if (!node) return result;
+        this.postOrder(node.left, result); // Traverse Left
+        this.postOrder(node.right, result); // Traverse Right
+        result.push(node.val); // Visit Root
+        return result;
+    }
+}
+
+const tree = new BinaryTree(1);
+tree.root!.left = new TreeNode(2);
+tree.root!.right = new TreeNode(3);
+// console.log(tree.inOrder(tree.root));`,
     questions: [
         { id: 226, title: "Invert Binary Tree", difficulty: "Easy", url: "https://leetcode.com/problems/invert-binary-tree/" },
         { id: 104, title: "Maximum Depth of Binary Tree", difficulty: "Easy", url: "https://leetcode.com/problems/maximum-depth-of-binary-tree/" },
@@ -704,24 +773,29 @@ Ağaçlar doğal olarak özyinelemelidir. Çoğu işlem (ekleme, arama, DFS) bir
 class BST {
     root: TreeNode | null = null;
 
+    // O(log N) Insert
     insert(val: number) {
         this.root = this._insert(this.root, val);
     }
 
+    // Recursive helper for insert
     private _insert(node: TreeNode | null, val: number): TreeNode {
-        if (!node) return new TreeNode(val);
+        if (!node) return new TreeNode(val); // Found empty spot
+        // Go Left or Right based on value
         if (val < node.val) node.left = this._insert(node.left, val);
         else if (val > node.val) node.right = this._insert(node.right, val);
         return node;
     }
 
+    // O(log N) Search
     search(val: number): boolean {
         return this._search(this.root, val);
     }
 
     private _search(node: TreeNode | null, val: number): boolean {
-        if (!node) return false;
-        if (val === node.val) return true;
+        if (!node) return false; // Not found
+        if (val === node.val) return true; // Found
+        // Traverse left or right
         return val < node.val 
             ? this._search(node.left, val) 
             : this._search(node.right, val);
@@ -739,17 +813,18 @@ class BST {
         } else if (val > node.val) {
             node.right = this._remove(node.right, val);
         } else {
-            // Node found
-            // Case 1: No child
+            // Node found!
+            // Case 1: Leaf node (no children)
             if (!node.left && !node.right) return null;
             // Case 2: One child
             if (!node.left) return node.right;
             if (!node.right) return node.left;
             
             // Case 3: Two children
-            // Find min in right subtree
+            // Find smallest value in right subtree (In-order successor)
             let minNode = this._findMin(node.right);
-            node.val = minNode.val;
+            node.val = minNode.val; // Replace value
+            // Delete duplicates
             node.right = this._remove(node.right, minNode.val);
         }
         return node;
@@ -847,38 +922,45 @@ Heap'ler işaretçi (pointer) gerektirmeden düz bir dizide saklanabildikleri i�
     
     constructor() { this.heap = []; }
 
-    // Parent: (i-1)/2, Left: 2*i+1, Right: 2*i+2
+    // Formula references:
+    // Left Child: 2*i + 1
+    // Right Child: 2*i + 2
+    // Parent: Math.floor((i-1) / 2)
 
+    // O(log N) Push
     push(val: number) {
-        this.heap.push(val);
-        this.heapifyUp(this.heap.length - 1);
+        this.heap.push(val); // Add to end
+        this.heapifyUp(this.heap.length - 1); // Bubble up
     }
 
+    // O(log N) Pop
     pop(): number | undefined {
         if (this.heap.length === 0) return undefined;
-        const min = this.heap[0];
+        const min = this.heap[0]; // Min is always at 0
         const end = this.heap.pop()!;
         if (this.heap.length > 0) {
-            this.heap[0] = end;
-            this.heapifyDown(0);
+            this.heap[0] = end; // Move last element to root
+            this.heapifyDown(0); // Bubble down
         }
         return min;
     }
 
+    // Restore heap property going up
     private heapifyUp(index: number) {
         const element = this.heap[index];
         while (index > 0) {
             let parentIdx = Math.floor((index - 1) / 2);
             let parent = this.heap[parentIdx];
-            if (element >= parent) break;
+            if (element >= parent) break; // Correct position found
             
-            // Swap
+            // Swap with parent
             this.heap[parentIdx] = element;
             this.heap[index] = parent;
             index = parentIdx;
         }
     }
     
+    // Restore heap property going down
     private heapifyDown(index: number) {
         const length = this.heap.length;
         const element = this.heap[index];
@@ -889,6 +971,7 @@ Heap'ler işaretçi (pointer) gerektirmeden düz bir dizide saklanabildikleri i�
             let leftChild, rightChild;
             let swapIdx = null;
 
+            // Check Left Value
             if(leftChildIdx < length) {
                 leftChild = this.heap[leftChildIdx];
                 if(leftChild < element) {
@@ -896,6 +979,7 @@ Heap'ler işaretçi (pointer) gerektirmeden düz bir dizide saklanabildikleri i�
                 }
             }
 
+            // Check Right Value
             if(rightChildIdx < length) {
                 rightChild = this.heap[rightChildIdx];
                 if(
@@ -906,8 +990,9 @@ Heap'ler işaretçi (pointer) gerektirmeden düz bir dizide saklanabildikleri i�
                 }
             }
 
-            if(swapIdx === null) break;
+            if(swapIdx === null) break; // No swaps needed
 
+            // Perform Swap
             this.heap[index] = this.heap[swapIdx];
             this.heap[swapIdx] = element;
             index = swapIdx;
@@ -981,22 +1066,25 @@ Gerçek dünyadaki çoğu graf (sosyal ağlar, web) **seyrektir** (her şey her 
     ],
     complexity: { time: "Varies", space: "O(V + E)" },
     codeSnippet: `class Graph {
+    // Adjacency List: Map<Vertex, List of Neighbors>
     adjacencyList: { [key: string]: string[] } = {};
 
     addVertex(vertex: string) {
         if (!this.adjacencyList[vertex]) {
-            this.adjacencyList[vertex] = [];
+            this.adjacencyList[vertex] = []; // Initialize empty list
         }
     }
 
     addEdge(v1: string, v2: string) {
-        // Undirected graph
+        // Undirected graph: Two-way connection
         this.adjacencyList[v1].push(v2);
         this.adjacencyList[v2].push(v1);
     }
 
     removeEdge(v1: string, v2: string) {
+        // Filter out v2 from v1's list
         this.adjacencyList[v1] = this.adjacencyList[v1].filter(v => v !== v2);
+        // Filter out v1 from v2's list
         this.adjacencyList[v2] = this.adjacencyList[v2].filter(v => v !== v1);
     }
 }`,
@@ -1072,40 +1160,44 @@ Trie aramalar için inanılmaz hızlıdır ancak düğümlerdeki boş pointerlar
     ],
     complexity: { time: "O(L)", space: "O(N * L)" },
     codeSnippet: `class TrieNode {
-    children: { [key: string]: TrieNode } = {};
-    isEndOfWord: boolean = false;
+    children: { [key: string]: TrieNode } = {}; // Map char -> TrieNode
+    isEndOfWord: boolean = false; // Marks end of a valid word
 }
 
 class Trie {
     root: TrieNode = new TrieNode();
 
+    // O(L) Insert
     insert(word: string) {
         let current = this.root;
         for (const char of word) {
             if (!current.children[char]) {
                 current.children[char] = new TrieNode();
             }
+            // Move down the tree
             current = current.children[char];
         }
-        current.isEndOfWord = true;
+        current.isEndOfWord = true; // Mark finish line
     }
 
+    // O(L) Search
     search(word: string): boolean {
         let current = this.root;
         for (const char of word) {
-            if (!current.children[char]) return false;
+            if (!current.children[char]) return false; // Path doesn't exist
             current = current.children[char];
         }
-        return current.isEndOfWord;
+        return current.isEndOfWord; // Must match entire word
     }
 
+    // O(L) Prefix Check
     startsWith(prefix: string): boolean {
         let current = this.root;
         for (const char of prefix) {
             if (!current.children[char]) return false;
             current = current.children[char];
         }
-        return true;
+        return true; // Prefix found
     }
 }`,
     questions: [
@@ -1182,7 +1274,7 @@ Bu esneklik karşılığında ödediğiniz bedel:
     codeSnippet: `class DNode<T> {
     val: T;
     next: DNode<T> | null = null;
-    prev: DNode<T> | null = null;
+    prev: DNode<T> | null = null; // Extra pointer for reverse traversal
     constructor(val: T) { this.val = val; }
 }
 
@@ -1190,6 +1282,9 @@ class DoublyLinkedList<T> {
     head: DNode<T> | null = null;
     tail: DNode<T> | null = null;
 
+    // O(1) Append to Tail
+    // 1. If list is empty, Head and Tail become the new node.
+    // 2. Else, link current Tail.next to new node, new node.prev to Tail, then update Tail.
     append(val: T) {
         const newNode = new DNode(val);
         if (!this.tail) {
@@ -1197,19 +1292,40 @@ class DoublyLinkedList<T> {
             this.tail = newNode;
         } else {
             this.tail.next = newNode;
-            newNode.prev = this.tail;
-            this.tail = newNode;
+            newNode.prev = this.tail; // Link back to old tail
+            this.tail = newNode;      // Update tail pointer
         }
     }
 
+    // O(1) Prepend to Head
+    // 1. If list is empty, Head and Tail become the new node.
+    // 2. Else, link new node.next to Head, Head.prev to new node, then update Head.
+    prepend(val: T) {
+        const newNode = new DNode(val);
+        if (!this.head) {
+            this.head = newNode;
+            this.tail = newNode;
+        } else {
+            newNode.next = this.head;
+            this.head.prev = newNode; // Link old head back to new node
+            this.head = newNode;      // Update head pointer
+        }
+    }
+
+    // O(1) Remove Last (Tail)
+    // 1. Access Tail directly.
+    // 2. Update Tail to be Tail.prev.
+    // 3. Set new Tail.next to null to sever connection.
     removeLast() {
-        if (!this.tail) return;
+        if (!this.tail) return; // Empty list
+        
         if (this.head === this.tail) {
+            // Only one element
             this.head = null;
             this.tail = null;
         } else {
-            this.tail = this.tail.prev;
-            this.tail!.next = null;
+            this.tail = this.tail.prev; // Move tail pointer back
+            this.tail!.next = null;     // Cut off the old last node
         }
     }
 }`,
@@ -1290,19 +1406,23 @@ Bu optimizasyonlarla karmaşıklık **O(α(N))** olur (Inverse Ackermann fonksiy
         this.parent = Array(n).fill(0).map((_, i) => i);
     }
 
+    // Find with Path Compression
+    // O(1) amortized
     find(x: number): number {
-        // Path Compression optimization
         if (this.parent[x] !== x) {
+            // Recursively find the root and point x directly to it
             this.parent[x] = this.find(this.parent[x]);
         }
         return this.parent[x];
     }
 
+    // Union disjoint sets
     union(x: number, y: number) {
         const rootX = this.find(x);
         const rootY = this.find(y);
+        
         if (rootX !== rootY) {
-            this.parent[rootX] = rootY; // Merge clouds
+            this.parent[rootX] = rootY; // Merge one root to another
         }
     }
 }`,
@@ -1372,16 +1492,175 @@ AVL ağaçları, sol ve sağ alt ağaçlar arasındaki yükseklik farkının en 
     constructor(k: number) { this.key = k; }
 }
 
-function rightRotate(y: AVLNode): AVLNode {
-    // Rotation logic
-    let x = y.left!;
-    let T2 = x.right;
-    x.right = y;
-    y.left = T2;
-    // Update heights...
-    return x;
-}
-// Full implementation implies rotations on insert/delete`,
+class AVLTree {
+    root: AVLNode | null = null;
+
+    // Helper: Get height safely
+    height(node: AVLNode | null): number {
+        return node ? node.height : 0;
+    }
+
+    // Helper: Get Balance factor (Left Height - Right Height)
+    getBalance(node: AVLNode | null): number {
+        return node ? this.height(node.left) - this.height(node.right) : 0;
+    }
+
+    // Right Rotate (for Left-heavy situations)
+    //       y           x
+    //      / \         / \
+    //     x   T3  ->  T1  y
+    //    / \             / \
+    //   T1  T2          T2 T3
+    rightRotate(y: AVLNode): AVLNode {
+        const x = y.left!;
+        const T2 = x.right;
+
+        // Perform rotation (Swap parents)
+        x.right = y;
+        y.left = T2;
+
+        // Update heights (Leafs first)
+        y.height = Math.max(this.height(y.left), this.height(y.right)) + 1;
+        x.height = Math.max(this.height(x.left), this.height(x.right)) + 1;
+
+        // Return new root of this subtree
+        return x;
+    }
+
+    // Left Rotate (for Right-heavy situations)
+    //   x           y
+    //  / \         / \
+    // T1  y   ->  x  T3
+    //    / \     / \
+    //   T2 T3   T1 T2
+    leftRotate(x: AVLNode): AVLNode {
+        const y = x.right!;
+        const T2 = y.left;
+
+        // Perform rotation
+        y.left = x;
+        x.right = T2;
+
+        // Update heights
+        x.height = Math.max(this.height(x.left), this.height(x.right)) + 1;
+        y.height = Math.max(this.height(y.left), this.height(y.right)) + 1;
+
+        return y;
+    }
+
+    insert(key: number) {
+        this.root = this._insert(this.root, key);
+    }
+
+    private _insert(node: AVLNode | null, key: number): AVLNode {
+        // 1. Perform normal BST insert
+        if (!node) return new AVLNode(key);
+
+        if (key < node.key) node.left = this._insert(node.left, key);
+        else if (key > node.key) node.right = this._insert(node.right, key);
+        else return node; // Equal keys not allowed
+
+        // 2. Update height of this ancestor node
+        node.height = 1 + Math.max(this.height(node.left), this.height(node.right));
+
+        // 3. Get balance factor to check for imbalance
+        const balance = this.getBalance(node);
+
+        // 4. Usage Rotations if unbalance
+
+        // Left Left Case: Inserted into left subtree of left child
+        if (balance > 1 && key < node.left!.key) {
+            return this.rightRotate(node);
+        }
+
+        // Right Right Case: Inserted into right subtree of right child
+        if (balance < -1 && key > node.right!.key) {
+            return this.leftRotate(node);
+        }
+
+        // Left Right Case: Inserted into right subtree of left child
+        if (balance > 1 && key > node.left!.key) {
+            node.left = this.leftRotate(node.left!); // Rotate left child first
+            return this.rightRotate(node); // Then rotate current
+        }
+
+        // Right Left Case: Inserted into left subtree of right child
+        if (balance < -1 && key < node.right!.key) {
+            node.right = this.rightRotate(node.right!);
+            return this.leftRotate(node);
+        }
+
+        return node;
+    }
+
+    delete(key: number) {
+        this.root = this._delete(this.root, key);
+    }
+
+    // Standard BST delete, but with re-balancing steps added
+    private _delete(root: AVLNode | null, key: number): AVLNode | null {
+        // 1. Standard BST delete
+        if (!root) return root;
+
+        if (key < root.key) {
+            root.left = this._delete(root.left, key);
+        } else if (key > root.key) {
+            root.right = this._delete(root.right, key);
+        } else {
+            // Node found
+            if ((!root.left) || (!root.right)) {
+                // One or Zero child
+                const temp = root.left ? root.left : root.right;
+                if (!temp) {
+                    root = null;
+                } else {
+                    root = temp;
+                }
+            } else {
+                // Two children: Get successor
+                const temp = this.minValueNode(root.right);
+                root.key = temp.key;
+                root.right = this._delete(root.right, temp.key);
+            }
+        }
+
+        if (!root) return root;
+
+        // 2. Update height
+        root.height = 1 + Math.max(this.height(root.left), this.height(root.right));
+
+        // 3. Balance Check
+        const balance = this.getBalance(root);
+
+        // 4. Re-balance if needed
+        // Left Left
+        if (balance > 1 && this.getBalance(root.left) >= 0) {
+            return this.rightRotate(root);
+        }
+        // Left Right
+        if (balance > 1 && this.getBalance(root.left) < 0) {
+            root.left = this.leftRotate(root.left!);
+            return this.rightRotate(root);
+        }
+        // Right Right
+        if (balance < -1 && this.getBalance(root.right) <= 0) {
+            return this.leftRotate(root);
+        }
+        // Right Left
+        if (balance < -1 && this.getBalance(root.right) > 0) {
+            root.right = this.rightRotate(root.right!);
+            return this.leftRotate(root);
+        }
+
+        return root;
+    }
+
+    minValueNode(node: AVLNode): AVLNode {
+        let current = node;
+        while (current.left) current = current.left;
+        return current;
+    }
+}`,
     questions: [
         { id: 110, title: "Balanced Binary Tree", difficulty: "Easy", url: "https://leetcode.com/problems/balanced-binary-tree/" },
         { id: 108, title: "Convert Sorted Array to Binary Search Tree", difficulty: "Easy", url: "https://leetcode.com/problems/convert-sorted-array-to-binary-search-tree/" },
@@ -1444,16 +1723,25 @@ A **Segment Tree** is a versatile tree structure used when you have an array and
 class SegmentTree {
     tree: number[];
     n: number;
+
     constructor(arr: number[]) {
         this.n = arr.length;
-        this.tree = new Array(4 * this.n);
+        this.tree = new Array(4 * this.n); // Max tree size is 4*n
         this.build(arr, 0, 0, this.n - 1);
     }
-    build(arr, node, start, end) {
-        if(start === end) { this.tree[node] = arr[start]; return; }
+
+    // Build the tree: O(N)
+    build(arr: number[], node: number, start: number, end: number) {
+        if(start === end) { 
+            // Leaf node: store array value
+            this.tree[node] = arr[start]; 
+            return; 
+        }
         const mid = Math.floor((start+end)/2);
+        // Build children
         this.build(arr, 2*node+1, start, mid);
         this.build(arr, 2*node+2, mid+1, end);
+        // Internal node: sum of children
         this.tree[node] = this.tree[2*node+1] + this.tree[2*node+2];
     }
     // Query O(logN)
@@ -1514,23 +1802,27 @@ A **Fenwick Tree** (Binary Indexed Tree) solves the same problem as a Segment Tr
 class FenwickTree {
     tree: number[];
     constructor(size: number) {
-        this.tree = new Array(size + 1).fill(0);
+        this.tree = new Array(size + 1).fill(0); // 1-based indexing usually
     }
+
+    // O(log N) Update
     update(i: number, delta: number) {
         // Add delta to index i and its ancestors
-        i++; // 1-based index
+        i++; // Convert 0-based to 1-based
         while(i < this.tree.length) {
             this.tree[i] += delta;
-            i += i & (-i);
+            i += i & (-i); // Move to next node (add LSB)
         }
     }
+
+    // O(log N) Query Prefix Sum
     query(i: number): number {
         // Sum from 0 to i
-        i++;
+        i++; // 1-based
         let sum = 0;
         while(i > 0) {
             sum += this.tree[i];
-            i -= i & (-i);
+            i -= i & (-i); // Move to parent (subtract LSB)
         }
         return sum;
     }
@@ -1590,15 +1882,185 @@ A **B-Tree** is a "fat" tree designed for storage systems. Each node can have th
     },
     complexity: { time: "O(log N)", space: "O(N)" },
     codeSnippet: `class BTreeNode {
-    keys: number[];
-    children: BTreeNode[];
+    keys: number[]; // Sorted keys
+    children: BTreeNode[]; // Pointers to children
     isLeaf: boolean;
-    // B-Tree Node has 't' to '2t' children
+    t: number; // Minimum degree (defines range of keys)
+
+    constructor(t: number, isLeaf: boolean = true) {
+        this.t = t;
+        this.isLeaf = isLeaf;
+        this.keys = [];
+        this.children = [];
+    }
 }
 
-// B-Tree ensures all leaf nodes are at same depth.
-// Insertion can cause node splitting growing UPWARDS.
-// Deletion can cause node merging.`,
+class BTree {
+    root: BTreeNode | null = null;
+    t: number; // Minimum degree
+
+    constructor(t: number) {
+        this.t = t;
+    }
+
+    insert(k: number) {
+        if (!this.root) {
+            // Case 1: Tree is empty
+            this.root = new BTreeNode(this.t, true);
+            this.root.keys[0] = k;
+        } else {
+            // Case 2: Root is full
+            if (this.root.keys.length === 2 * this.t - 1) {
+                const s = new BTreeNode(this.t, false);
+                s.children.push(this.root);
+                // Split old root into two
+                this.splitChild(s, 0);
+                this.root = s;
+                // Insert into the new appropriate child
+                this._insertNonFull(s, k);
+            } else {
+                this._insertNonFull(this.root, k);
+            }
+        }
+    }
+
+    // Insert into a non-full node
+    private _insertNonFull(x: BTreeNode, k: number) {
+        let i = x.keys.length - 1;
+        if (x.isLeaf) {
+            // Find location and shift keys
+            while (i >= 0 && k < x.keys[i]) i--;
+            x.keys.splice(i + 1, 0, k);
+        } else {
+            // Find child to descend
+            while (i >= 0 && k < x.keys[i]) i--;
+            i++;
+            // If child is full, split it first
+            if (x.children[i].keys.length === 2 * this.t - 1) {
+                this.splitChild(x, i);
+                if (k > x.keys[i]) i++;
+            }
+            this._insertNonFull(x.children[i], k);
+        }
+    }
+
+    // Split a full child y of node x
+    private splitChild(x: BTreeNode, i: number) {
+        const t = this.t;
+        const y = x.children[i];
+        const z = new BTreeNode(t, y.isLeaf);
+        
+        // Move middle key up to parent x
+        x.keys.splice(i, 0, y.keys[t - 1]);
+        x.children.splice(i + 1, 0, z);
+
+        // Move second half of keys to new sibling z
+        z.keys = y.keys.splice(t);
+        y.keys.pop(); // Remove median from y (it moved up)
+
+        // Move second half of children to z
+        if (!y.isLeaf) {
+            z.children = y.children.splice(t);
+        }
+    }
+
+    delete(k: number) {
+        if (!this.root) return;
+        this._delete(this.root, k);
+        // If root became empty (and not leaf), replace with its only child
+        if (this.root.keys.length === 0) {
+            this.root = this.root.isLeaf ? null : this.root.children[0];
+        }
+    }
+
+    private _delete(x: BTreeNode, k: number) {
+        const t = this.t;
+        let idx = x.keys.findIndex(key => key >= k);
+        
+        // Case 1: Key k is present in node x
+        if (idx < x.keys.length && x.keys[idx] === k) {
+            if (x.isLeaf) {
+                // 1a: x is leaf, simple delete
+                x.keys.splice(idx, 1);
+            } else {
+                // 1b: x is internal node
+                const y = x.children[idx]; // Child before k
+                const z = x.children[idx + 1]; // Child after k
+                
+                if (y.keys.length >= t) {
+                    // Predecessor is safe to borrow from
+                    const pred = this._getPredecessor(y);
+                    x.keys[idx] = pred;
+                    this._delete(y, pred);
+                } else if (z.keys.length >= t) {
+                    // Successor is safe to borrow from
+                    const succ = this._getSuccessor(z);
+                    x.keys[idx] = succ;
+                    this._delete(z, succ);
+                } else {
+                    // Both small, merge y and k into z (or y, k, z)
+                    this._merge(x, idx, y, z);
+                    this._delete(y, k);
+                }
+            }
+        } else {
+            // Case 2: Key Not present, go down
+            if (x.isLeaf) return; // Not found
+            
+            const childIdx = idx;
+            const child = x.children[childIdx];
+            
+            // Ensure child has enough keys (>= t)
+            if (child.keys.length === t - 1) {
+                // Try borrow from left sibling
+                if (childIdx > 0 && x.children[childIdx - 1].keys.length >= t) {
+                    const sibling = x.children[childIdx - 1];
+                    // Move parent key down
+                    child.keys.unshift(x.keys[childIdx - 1]);
+                    // Move sibling key up
+                    x.keys[childIdx - 1] = sibling.keys.pop()!;
+                    // Move sibling child if not leaf
+                    if (!child.isLeaf) child.children.unshift(sibling.children.pop()!);
+                }
+                // Try borrow from right sibling
+                else if (childIdx < x.keys.length && x.children[childIdx + 1].keys.length >= t) {
+                    const sibling = x.children[childIdx + 1];
+                    child.keys.push(x.keys[childIdx]);
+                    x.keys[childIdx] = sibling.keys.shift()!;
+                    if (!child.isLeaf) child.children.push(sibling.children.shift()!);
+                }
+                // Merge with duplicate
+                else {
+                    if (childIdx < x.keys.length) this._merge(x, childIdx, child, x.children[childIdx + 1]);
+                    else this._merge(x, childIdx - 1, x.children[childIdx - 1], child);
+                }
+            }
+            this._delete(x.children[childIdx], k); // Recurse
+        }
+    }
+
+    private _getPredecessor(node: BTreeNode): number {
+        while (!node.isLeaf) node = node.children[node.children.length - 1];
+        return node.keys[node.keys.length - 1];
+    }
+
+    private _getSuccessor(node: BTreeNode): number {
+        while (!node.isLeaf) node = node.children[0];
+        return node.keys[0];
+    }
+
+    private _merge(x: BTreeNode, idx: number, y: BTreeNode, z: BTreeNode) {
+        const t = this.t;
+        // Merge k and z into y
+        y.keys.push(x.keys[idx]);
+        y.keys.push(...z.keys);
+        if (!y.isLeaf) y.children.push(...z.children);
+        
+        // Remove k and pointer to z from x
+        x.keys.splice(idx, 1);
+        x.children.splice(idx + 1, 1);
+    }
+}`,
     questions: [
         { id: 589, title: "N-ary Tree Preorder Traversal", difficulty: "Easy", url: "https://leetcode.com/problems/n-ary-tree-preorder-traversal/" },
         { id: 590, title: "N-ary Tree Postorder Traversal", difficulty: "Easy", url: "https://leetcode.com/problems/n-ary-tree-postorder-traversal/" },
@@ -1656,14 +2118,101 @@ A **Skip List** provides O(log N) search efficiency like balanced trees (AVL, Re
     },
     complexity: { time: "O(log N)", space: "O(N)" },
     codeSnippet: `class SkipListNode {
-    value: number;
+    val: number;
     next: SkipListNode[];
-    // 'next' is an array of pointers for different levels
+    constructor(val: number, level: number) {
+        this.val = val;
+        this.next = new Array(level).fill(null);
+    }
 }
 
-// Search: Start at top level, move right until next > target, then move down.
-// Insert: Flip coin to decide how many levels new node spans.
-// O(log N) average case driven by randomization.`,
+class Skiplist {
+    private head: SkipListNode;
+    private maxLevel: number = 16;
+    private level: number = 0; // Current max level active
+
+    constructor() {
+        this.head = new SkipListNode(-1, this.maxLevel);
+    }
+
+    // O(log N) Search
+    search(target: number): boolean {
+        let curr = this.head;
+        // Start from top, move right or down
+        for (let i = this.level - 1; i >= 0; i--) {
+            while (curr.next[i] && curr.next[i].val < target) {
+                curr = curr.next[i];
+            }
+        }
+        curr = curr.next[0]; // Bottom level check
+        return curr !== null && curr.val === target;
+    }
+
+    // O(log N) Add
+    add(num: number): void {
+        const update = new Array(this.maxLevel).fill(this.head);
+        let curr = this.head;
+        // Find insert positions for all levels
+        for (let i = this.level - 1; i >= 0; i--) {
+            while (curr.next[i] && curr.next[i].val < num) {
+                curr = curr.next[i];
+            }
+            update[i] = curr;
+        }
+
+        // Determine random level
+        const lvl = this.randomLevel();
+        if (lvl > this.level) {
+            for (let i = this.level; i < lvl; i++) {
+                update[i] = this.head;
+            }
+            this.level = lvl;
+        }
+
+        const newNode = new SkipListNode(num, lvl);
+        // Link new node
+        for (let i = 0; i < lvl; i++) {
+            newNode.next[i] = update[i].next[i];
+            update[i].next[i] = newNode;
+        }
+    }
+
+    // O(log N) Erase
+    erase(num: number): boolean {
+        const update = new Array(this.maxLevel).fill(this.head);
+        let curr = this.head;
+        for (let i = this.level - 1; i >= 0; i--) {
+            while (curr.next[i] && curr.next[i].val < num) {
+                curr = curr.next[i];
+            }
+            update[i] = curr;
+        }
+        
+        curr = curr.next[0];
+        if (!curr || curr.val !== num) return false;
+
+        // Splice out the node from all levels
+        for (let i = 0; i < this.level; i++) {
+            if (update[i].next[i] !== curr) break;
+            update[i].next[i] = curr.next[i];
+        }
+
+        // Lower current max level if top layer empty
+        while (this.level > 1 && this.head.next[this.level - 1] === null) {
+            this.level--;
+        }
+        return true;
+    }
+
+    private randomLevel(): number {
+        let lvl = 1;
+        // Coin flip mechanism (50% chance to go up)
+        while (Math.random() < 0.5 && lvl < this.maxLevel) {
+            lvl++;
+        }
+        return lvl;
+    }
+}`,
     questions: [
         { id: 706, title: "Design HashMap", difficulty: "Easy", url: "https://leetcode.com/problems/design-hashmap/" },
         { id: 705, title: "Design HashSet", difficulty: "Easy", url: "https://leetcode.com/problems/design-hashset/" },

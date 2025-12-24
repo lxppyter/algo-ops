@@ -54,22 +54,26 @@ Kaba kuvvet yaklaşımında (İç İçe Döngüler), her \`i\` elemanı için t�
     ],
     complexity: { time: "O(N)", space: "O(1)" },
     codeSnippet: `// Template for catching a target sum in Sorted Array
+// Template for catching a target sum in Sorted Array using Two Pointers
 function twoSumSorted(arr: number[], target: number): number[] {
     let left = 0;
     let right = arr.length - 1;
 
     while (left < right) {
+        // Calculate sum of elements at pointers
         let currentSum = arr[left] + arr[right];
 
         if (currentSum === target) {
-            return [left, right];
+            return [left, right]; // Found the pair!
         } else if (currentSum < target) {
-            left++; // Need bigger sum
+            // Sum is too small, need larger values -> Move Left pointer forward
+            left++; 
         } else {
-            right--; // Need smaller sum
+            // Sum is too big, need smaller values -> Move Right pointer backward
+            right--; 
         }
     }
-    return [-1, -1];
+    return [-1, -1]; // Pair not found
 }`,
     questions: [
         { id: 125, title: "Valid Palindrome", difficulty: "Easy", url: "https://leetcode.com/problems/valid-palindrome/" },
@@ -133,22 +137,25 @@ Dinamik pencerede \`for\` döngüsü içinde \`while\` döngüsü olsa bile, her
     ],
     complexity: { time: "O(N)", space: "O(1)" },
     codeSnippet: `// Template for Variable Window
+// Template for Dynamic Sliding Window
 function slidingWindow(arr: number[]) {
     let left = 0;
     let currentSum = 0;
-    let bestAns = 0;
+    let bestAns = 0; // Max length, min length, etc.
 
+    // Right pointer expands the window
     for (let right = 0; right < arr.length; right++) {
-        // 1. Add element to window
+        // 1. Add element to window to expand
         currentSum += arr[right];
 
-        // 2. Shrink window while condition is broken
+        // 2. Shrink window from LEFT while condition is broken (e.g. sum > target)
         while (currentSum > TARGET) {
             currentSum -= arr[left];
-            left++;
+            left++; // Move left pointer to shrink
         }
 
-        // 3. Update answer
+        // 3. Update answer with valid window
+        // Size of window = right - left + 1
         bestAns = Math.max(bestAns, right - left + 1);
     }
 }`,
@@ -225,13 +232,17 @@ Basit toplamların ötesinde:
     private prefix: number[];
 
     constructor(nums: number[]) {
+        // Build Prefix Sum Array
+        // prefix[i] stores sum of nums[0...i-1]
         this.prefix = new Array(nums.length + 1).fill(0);
         for(let i=0; i<nums.length; i++) {
             this.prefix[i + 1] = this.prefix[i] + nums[i];
         }
     }
 
+    // Get sum of subarray [left, right] in O(1)
     sumRange(left: number, right: number): number {
+        // Formula: Prefix[R+1] - Prefix[L]
         return this.prefix[right + 1] - this.prefix[left];
     }
 }`,
@@ -304,19 +315,21 @@ Eğer döngü VARSA (daire), Hızlı olan tur bindirir ve sonunda Yavaş olanı 
         { en: "Modifies navigation logic typically", tr: "Gezinme mantığını değiştirir" }
     ],
     complexity: { time: "O(N)", space: "O(1)" },
-    codeSnippet: `function hasCycle(head: ListNode | null): boolean {
-    let slow = head;
-    let fast = head;
+    codeSnippet: `// Floyd's Cycle Detection Algorithm (Tortoise & Hare)
+function hasCycle(head: ListNode | null): boolean {
+    let slow = head; // Moves 1 step
+    let fast = head; // Moves 2 steps
 
     while (fast !== null && fast.next !== null) {
-        slow = slow!.next;
-        fast = fast.next.next;
+        slow = slow!.next;       // Step 1
+        fast = fast.next.next;   // Step 2
 
+        // If they assume same reference, there is a cycle
         if (slow === fast) {
             return true; // Cycle detected
         }
     }
-    return false;
+    return false; // Fast reached end -> No cycle
 }`,
     questions: [
         { id: 141, title: "Linked List Cycle", difficulty: "Easy", url: "https://leetcode.com/problems/linked-list-cycle/" },
@@ -390,10 +403,12 @@ Bu desen, örtüşen (çakışan) aralıklarla başa çıkmak için verimli bir 
     ],
     complexity: { time: "O(N log N)", space: "O(N)" },
     codeSnippet: `// Merge Intervals: Time O(N log N) | Space O(N)
+// Merge Intervals: Time O(N log N) | Space O(N)
 function merge(intervals: number[][]): number[][] {
     if (intervals.length <= 1) return intervals;
 
-    // 1. Sort by start time
+    // 1. Sort by start time (Crucial step)
+    // Overlapping intervals will be adjacent after sorting
     intervals.sort((a, b) => a[0] - b[0]);
 
     const result: number[][] = [intervals[0]];
@@ -402,12 +417,13 @@ function merge(intervals: number[][]): number[][] {
         const current = intervals[i];
         const lastMerged = result[result.length - 1];
 
-        // 2. Overlap?
+        // 2. Overlap Check
+        // If current starts BEFORE last ends, they overlap
         if (current[0] <= lastMerged[1]) {
-            // Merge: End time is max of both
+            // Merge: New end is the max of both ends
             lastMerged[1] = Math.max(lastMerged[1], current[1]);
         } else {
-            // No overlap, add interval
+            // No overlap, add interval to result
             result.push(current);
         }
     }
@@ -487,6 +503,8 @@ Bu desen, özellikle belirli bir aralıkta (\`1\` ila \`N\` gibi) sayılar içer
     ],
     complexity: { time: "O(N)", space: "O(1)" },
     codeSnippet: `// Cyclic Sort: Time O(N) | Space O(1)
+// Cyclic Sort: Time O(N) | Space O(1)
+// Works because numbers are in range [1...N]
 function cyclicSort(nums: number[]): void {
     let i = 0;
     while (i < nums.length) {
@@ -494,10 +512,12 @@ function cyclicSort(nums: number[]): void {
         const correctIndex = nums[i] - 1; 
         
         // Is number at correct place?
+        // Also check if nums[correctIndex] is the same to avoid infinite loop with duplicates
         if (nums[i] !== nums[correctIndex]) {
-            // Swap
+            // Swap number to its correct spot
             [nums[i], nums[correctIndex]] = [nums[correctIndex], nums[i]];
         } else {
+            // Correctly placed, move to next
             i++;
         }
     }
@@ -583,20 +603,80 @@ Heap, kökün her zaman en küçük (veya en büyük) olmasını sağlayan bir i
     complexity: { time: "O(N log K)", space: "O(K)" },
     codeSnippet: `// Top K Elements using Min-Heap
 // Time: O(N log K) | Space: O(K)
+// Top K Elements using Min-Heap
+// Time: O(N log K) | Space: O(K)
 function topKElements(nums: number[], k: number): number[] {
-    // Conceptual Min-Heap (Assuming Heap class exists)
-    // const minHeap = new MinHeap<number>();
+    // MinHeap Class to keep track of the Top K largest elements
+    // The root of the MinHeap is the smallest among the Top K.
+    class MinHeap {
+        heap: number[];
+        constructor() { this.heap = []; }
+        
+        // Add element and bubble up to correct position
+        push(val: number) {
+            this.heap.push(val);
+            this.bubbleUp(this.heap.length - 1);
+        }
+        
+        // Remove the smallest element (root) and re-balance
+        pop(): number | undefined {
+            if (this.size() === 0) return undefined;
+            const min = this.heap[0];
+            const end = this.heap.pop()!;
+            if (this.size() > 0) {
+                this.heap[0] = end;
+                this.bubbleDown(0);
+            }
+            return min;
+        }
+        
+        size(): number { return this.heap.length; }
+        
+        // Restore Heap property going UP
+        private bubbleUp(idx: number) {
+            const el = this.heap[idx];
+            while (idx > 0) {
+                const pIdx = Math.floor((idx - 1) / 2);
+                if (el >= this.heap[pIdx]) break;
+                this.heap[idx] = this.heap[pIdx];
+                idx = pIdx;
+            }
+            this.heap[idx] = el;
+        }
+        
+        // Restore Heap property going DOWN
+        private bubbleDown(idx: number) {
+            const len = this.heap.length;
+            const el = this.heap[idx];
+            while (true) {
+                let left = 2 * idx + 1, right = 2 * idx + 2;
+                let swap: number | null = null;
+                
+                if (left < len && this.heap[left] < el) swap = left;
+                if (right < len && this.heap[right] < (swap === null ? el : this.heap[swap])) swap = right;
+                
+                if (swap === null) break;
+                this.heap[idx] = this.heap[swap];
+                idx = swap;
+            }
+            this.heap[idx] = el;
+        }
+    }
 
-    // for (const num of nums) {
-    //     minHeap.push(num);
-    //     if (minHeap.size() > k) {
-    //         minHeap.pop(); // Remove smallest
-    //     }
-    // }
-    // return minHeap.toArray();
+    const minHeap = new MinHeap();
+    for (const num of nums) {
+        minHeap.push(num);
+        // CRITICAL LOGIC: 
+        // We want to keep the K LARGEST elements. 
+        // If we have more than K, we remove the SMALLEST one (the root of MinHeap).
+        // This effectively filters out the smaller numbers, leaving only the "heavyweights".
+        if (minHeap.size() > k) minHeap.pop();
+    }
     
-    // For Native JS (Sort way - slower O(N log N))
-    return nums.sort((a,b) => b-a).slice(0, k);
+    // Extract remaining elements (Top K)
+    const res: number[] = [];
+    while (minHeap.size() > 0) res.unshift(minHeap.pop()!); // unshift for descending order
+    return res;
 }`,
     questions: [
         { id: 414, title: "Third Maximum Number", difficulty: "Easy", url: "https://leetcode.com/problems/third-maximum-number/" },
@@ -675,18 +755,105 @@ Medyan orta elemandır. Verimli bir şekilde bulmak için veriyi iki yarıya bö
         { en: "Needs re-balancing on every insert", tr: "Her eklemede yeniden dengeleme gerektirir" }
     ],
     complexity: { time: "O(log N)", space: "O(N)" },
-    codeSnippet: `class MedianFinder {
-    // maxHeap stores smaller half
-    // minHeap stores larger half
+    codeSnippet: `// Generic Heap Class (Min or Max based on comparator)
+class Heap {
+    data: number[];
+    compare: (a: number, b: number) => number;
     
-    addNum(num: number): void {
-        // Balance logic...
+    constructor(compare: (a: number, b: number) => number) {
+        this.data = [];
+        this.compare = compare;
     }
     
+    push(val: number) {
+        this.data.push(val);
+        this.bubbleUp(this.data.length - 1);
+    }
+    
+    pop(): number | undefined {
+        if (this.size() === 0) return undefined;
+        const top = this.data[0];
+        const last = this.data.pop()!;
+        if (this.size() > 0) {
+            this.data[0] = last;
+            this.bubbleDown(0);
+        }
+        return top;
+    }
+    
+    peek(): number | undefined { return this.data[0]; }
+    
+    size(): number { return this.data.length; }
+    
+    private bubbleUp(idx: number) {
+        const el = this.data[idx];
+        while (idx > 0) {
+            const pIdx = Math.floor((idx - 1) / 2);
+            // Compare current with parent
+            if (this.compare(el, this.data[pIdx]) >= 0) break;
+            this.data[idx] = this.data[pIdx];
+            idx = pIdx;
+        }
+        this.data[idx] = el;
+    }
+    
+    private bubbleDown(idx: number) {
+        const len = this.data.length;
+        const el = this.data[idx];
+        while (true) {
+            let left = 2 * idx + 1, right = 2 * idx + 2;
+            let swap: number | null = null;
+            
+            // Check children
+            if (left < len && this.compare(this.data[left], el) < 0) swap = left;
+            if (right < len && this.compare(this.data[right], (swap === null ? el : this.data[swap])) < 0) swap = right;
+            
+            if (swap === null) break;
+            this.data[idx] = this.data[swap];
+            idx = swap;
+        }
+        this.data[idx] = el;
+    }
+}
+
+// Median Finder using Two Heaps
+// Median Finder using Two Heaps
+// Time: Add O(log N) | Find O(1)
+class MedianFinder {
+    minHeap: Heap; // Stores the LARGER half of numbers (Root is smallest of large)
+    maxHeap: Heap; // Stores the SMALLER half of numbers (Root is largest of small)
+
+    constructor() {
+        this.minHeap = new Heap((a, b) => a - b); // Min Heap
+        this.maxHeap = new Heap((a, b) => b - a); // Max Heap
+    }
+
+    // Add a number and rebalance heaps
+    addNum(num: number): void {
+        // 1. Always push to Max Heap first (Smaller Half)
+        this.maxHeap.push(num);
+        
+        // 2. Balancing Step:
+        // The largest element of the "Smaller Half" (maxHeap root) might actually belong in the "Larger Half".
+        // Move it to MinHeap to correct this.
+        this.minHeap.push(this.maxHeap.pop()!);
+        
+        // 3. Size Maintenance:
+        // We want MaxHeap to be either same size or 1 greater than MinHeap.
+        // If MinHeap became bigger, move its root back to MaxHeap.
+        if (this.minHeap.size() > this.maxHeap.size()) {
+            this.maxHeap.push(this.minHeap.pop()!);
+        }
+    }
+
+    // Return the median
     findMedian(): number {
-        // If heaps equal size: average of tops
-        // Else: top of maxHeap
-        return 0; 
+        // If odd number of elements, MaxHeap has the extra one (the median)
+        if (this.maxHeap.size() > this.minHeap.size()) {
+            return this.maxHeap.peek()!;
+        }
+        // If even number of elements, average the roots of both heaps
+        return (this.maxHeap.peek()! + this.minHeap.peek()!) / 2;
     }
 }`,
     questions: [
