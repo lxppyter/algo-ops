@@ -1,6 +1,6 @@
-# AlgoOps - Algoritmalar ve Sistem Tasarımı Öğrenme Platformu
+# Argus Panoptes - Algoritmalar ve Veri Yapıları Öğrenme Platformu
 
-AlgoOps, karmaşık veri yapılarını, algoritmaları ve sistem tasarımı kavramlarını herkes için anlaşılır hale getirmeyi amaçlayan, modern ve etkileşimli bir öğrenme platformudur.
+Argus Panoptes, karmaşık veri yapılarını, algoritmaları ve sistem tasarımı kavramlarını herkes için anlaşılır hale getirmeyi amaçlayan, modern ve etkileşimli bir öğrenme platformudur.
 
 Bu projenin temel amacı, teknik mülakatlara hazırlanan yazılımcılar için konuları hem **akademik/profesyonel** derinlikte hem de **basitleştirilmiş (ELI5)** bir dille sunmaktır.
 
