@@ -4,7 +4,7 @@ import "./globals.css";
 import { ExplanationProvider } from "@/context/explanation-context";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
-import { FloatingCoffee } from "@/components/floating-coffee";
+// import { FloatingCoffee } from "@/components/floating-coffee";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -17,8 +17,8 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 const inconsolata = Inconsolata({
-    variable: "--font-inconsolata",
-    subsets: ["latin"],
+  variable: "--font-inconsolata",
+  subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
@@ -38,11 +38,9 @@ export default function RootLayout({
       >
         <ExplanationProvider>
           <Navbar />
-          <main className="min-h-[calc(100vh-4rem)]">
-            {children}
-          </main>
+          <main className="min-h-[calc(100vh-4rem)]">{children}</main>
           <Footer />
-          <FloatingCoffee />
+          {/* <FloatingCoffee /> */}
         </ExplanationProvider>
       </body>
     </html>

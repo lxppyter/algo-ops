@@ -1,8 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { Coffee, Github } from "lucide-react";
-import { Button } from "@/components/ui/button";
 
 export function Footer() {
   return (
@@ -11,16 +9,16 @@ export function Footer() {
         <p className="text-center text-sm leading-loose text-muted-foreground md:text-left">
           Built by{" "}
           <Link
-            href="https://github.com/jxpyter"
+            href="https://github.com/lxppyter"
             target="_blank"
             rel="noreferrer"
             className="font-medium underline underline-offset-4"
           >
-            jxpyter
+            lxppyter
           </Link>
           . The source code is available on{" "}
           <Link
-            href="https://github.com/jxpyter/algo-ops"
+            href="https://github.com/lxppyter/argus-panoptes"
             target="_blank"
             rel="noreferrer"
             className="font-medium underline underline-offset-4"
@@ -29,18 +27,6 @@ export function Footer() {
           </Link>
           .
         </p>
-        <div className="flex items-center gap-2">
-           <Link href="https://buymeacoffee.com/lxppyter" target="_blank">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-yellow-600 dark:text-yellow-500 gap-2"
-            >
-              <Coffee className="h-4 w-4" />
-              <span>Buy Me A Coffee</span>
-            </Button>
-          </Link>
-        </div>
       </div>
     </footer>
   );

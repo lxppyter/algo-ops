@@ -1,26 +1,23 @@
-# AlgoOps - Algorithms and System Design Learning Platform
+# Argus Panoptes - Algorithms and System Design Learning Platform
 
-AlgoOps is a modern, interactive learning platform designed to demystify complex data structures, algorithms, and system design concepts for everyone.
+Argus Panoptes is a modern, interactive learning platform designed to demystify complex data structures, algorithms, and system design concepts for everyone.
 
 The primary goal of this project is to present topics with both **academic/professional** depth and a **simplified (ELI5)** language for developers preparing for technical interviews or anyone wanting to learn computer science fundamentals.
 
 ## 🌟 Features
 
-- **🔄 Dual Domains**: 
+- **🔄 Dual Domains**:
   - **DSA (Data Structures & Algorithms)**: Core algorithms and data structures.
-  - **System Design & DB**: Database architectures and system design principles.
-  
-- **👶 ELI5 (Explain Like I'm 5) Mode**: 
+- **👶 ELI5 (Explain Like I'm 5) Mode**:
   - Transform complex technical explanations into simple metaphors understandable by a 5-year-old with a single click.
-  
-- **🌍 Multi-Language Support**: 
+- **🌍 Multi-Language Support**:
   - Full content support in both Turkish and English. Learn in your preferred language.
 
-- **🎨 Modern and Sleek Interface**: 
+- **🎨 Modern and Sleek Interface**:
   - Eye-friendly dark mode compatible design.
   - Smooth transitions and micro-animations.
 
-- **💻 Code Examples & Visualization**: 
+- **💻 Code Examples & Visualization**:
   - Syntax-highlighted code blocks supporting the topic explanations.
 
 ## 🛠️ Tech Stack
@@ -40,12 +37,14 @@ This project is built using the latest web technologies:
 Follow these steps to run the project locally:
 
 1. **Clone the repository:**
+
    ```bash
-   git clone https://github.com/jxpyter/algo-ops.git
-   cd algo-ops
+   git clone https://github.com/lxppyter/argus-panoptes.git
+   cd argus-panoptes
    ```
 
 2. **Install dependencies:**
+
    ```bash
    npm install
    # or
@@ -57,24 +56,13 @@ Follow these steps to run the project locally:
    ```
 
 3. **Start the development server:**
+
    ```bash
    npm run dev
    ```
 
 4. **View the application:**
    Open [http://localhost:3000](http://localhost:3000) in your browser.
-
-## 📂 Project Structure
-
-- `app/`: Next.js App Router pages and layout files.
-  - `algorithms/`: Algorithm topic pages.
-  - `data-structures/`: Data structure topic pages.
-  - `patterns/`: Design patterns.
-  - `topics/`: General topic listings.
-- `components/`: Reusable UI components (Button, Card, Input, etc.).
-- `context/`: Global state management (Language selection, Explanation mode).
-- `lib/`: Helper functions and static content data (`content.ts`).
-- `public/`: Static images and files.
 
 ## 🤝 Contributing
 

@@ -1,16 +1,15 @@
-
-export type Category = 'Algorithm' | 'Data Structure' | 'Pattern' | 'Database Concept' | 'System Design';
-export type Domain = 'DSA' | 'DBA';
+export type Category = "Algorithm" | "Data Structure" | "Pattern";
+export type Domain = "DSA";
 
 export interface LocalizedText {
-    en: string;
-    tr: string;
+  en: string;
+  tr: string;
 }
 
 export interface LeetCodeQuestion {
   id: number;
   title: string;
-  difficulty: 'Easy' | 'Medium' | 'Hard';
+  difficulty: "Easy" | "Medium" | "Hard";
   url: string;
 }
 
@@ -32,5 +31,5 @@ export interface ContentItem {
   };
   codeSnippet: string;
   questions: LeetCodeQuestion[];
-  level?: 'Junior' | 'Mid' | 'Senior'; // Added level field
+  level?: "Junior" | "Mid" | "Senior"; // Added level field
 }

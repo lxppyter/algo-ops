@@ -20,14 +20,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuGroup,
 } from "@/components/ui/dropdown-menu";
-import {
-  BookMarked,
-  CalendarDays,
-  Menu,
-  Github,
-  Languages,
-  Coffee,
-} from "lucide-react";
+import { BookMarked, Menu, Github, Languages } from "lucide-react";
 
 export function Navbar() {
   const { mode, toggleMode, domain, setDomain, language, setLanguage } =
@@ -35,7 +28,7 @@ export function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
 
-  const handleDomainChange = (newDomain: "DSA" | "DBA") => {
+  const handleDomainChange = (newDomain: "DSA") => {
     setDomain(newDomain);
     if (pathname !== "/") {
       router.push("/");
@@ -49,53 +42,13 @@ export function Navbar() {
         <div className="flex items-center gap-2 sm:gap-6">
           <Link href="/" className="flex items-center space-x-2">
             <span className="text-xl sm:text-2xl font-bold font-heading bg-gradient-to-r from-indigo-500 to-purple-600 bg-clip-text text-transparent truncate max-w-[100px] sm:max-w-none">
-              AlgoOps
+              Argus Panoptes
             </span>
           </Link>
-
-          {/* Domain Selector - Always Visible */}
-          <div className="flex items-center bg-secondary/30 p-1 rounded-lg border border-border/50 gap-1">
-            <button
-              onClick={() => handleDomainChange("DSA")}
-              className={`px-2 sm:px-3 py-1.5 rounded-md text-xs sm:text-sm font-medium transition-all duration-200 ${
-                domain === "DSA" && pathname !== "/patterns"
-                  ? "bg-background shadow-sm text-foreground"
-                  : "text-muted-foreground hover:text-foreground/80"
-              }`}
-            >
-              DSA
-            </button>
-            
-            <div className="w-px h-4 bg-border/40 mx-1" />
-
-            <Link href="/patterns">
-               <button className={`px-2 sm:px-3 py-1.5 rounded-md text-xs sm:text-sm font-medium transition-all duration-200 ${
-                  pathname === "/patterns"
-                    ? "bg-background shadow-sm text-foreground" 
-                    : "text-muted-foreground hover:text-foreground hover:bg-background/50"
-               }`}>
-                  {language === "tr" ? "Pattern" : "Patterns"}
-               </button>
-            </Link>
-
-            <div className="w-px h-4 bg-border/40 mx-1" />
-
-            <button
-              onClick={() => handleDomainChange("DBA")}
-              className={`px-2 sm:px-3 py-1.5 rounded-md text-xs sm:text-sm font-medium transition-all duration-200 ${
-                domain === "DBA" && pathname !== "/patterns"
-                  ? "bg-background shadow-sm text-orange-600 dark:text-orange-400"
-                  : "text-muted-foreground hover:text-foreground/80"
-              }`}
-            >
-              DBA
-            </button>
-          </div>
         </div>
 
         {/* Center: Navigation Links - Desktop Only */}
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 hidden lg:flex items-center gap-6">
-
           <HoverCard openDelay={200}>
             <HoverCardTrigger asChild>
               <Button
@@ -191,24 +144,13 @@ export function Navbar() {
             </span>
           </div>
 
-          <Link href="https://github.com/jxpyter" target="_blank">
+          <Link href="https://github.com/lxppyter" target="_blank">
             <Button
               variant="ghost"
               size="icon"
               className="hidden lg:flex w-9 h-9"
             >
               <Github className="w-5 h-5" />
-            </Button>
-          </Link>
-
-          <Link href="https://buymeacoffee.com/lxppyter" target="_blank">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="hidden lg:flex w-9 h-9 text-yellow-500 hover:text-yellow-600"
-              title="Buy Me A Coffee"
-            >
-              <Coffee className="w-5 h-5" />
             </Button>
           </Link>
 
@@ -281,24 +223,16 @@ export function Navbar() {
 
                 <DropdownMenuSeparator />
 
-                  <DropdownMenuItem asChild>
-                    <Link
-                      href="https://github.com/jxpyter"
-                      target="_blank"
-                      className="flex items-center gap-2 w-full cursor-pointer"
-                    >
-                      <Github className="w-5 h-5" /> GitHub
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link
-                      href="https://buymeacoffee.com/lxppyter"
-                      target="_blank"
-                      className="flex items-center gap-2 w-full cursor-pointer text-yellow-600 dark:text-yellow-500"
-                    >
-                      <Coffee className="w-5 h-5" /> Buy Me A Coffee
-                    </Link>
-                  </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link
+                    href="https://github.com/lxppyter"
+                    target="_blank"
+                    className="flex items-center gap-2 w-full cursor-pointer"
+                  >
+                    <Github className="w-5 h-5" /> GitHub
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild></DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>

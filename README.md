@@ -1,26 +1,24 @@
 # AlgoOps - Algoritmalar ve Sistem Tasarımı Öğrenme Platformu
 
-AlgoOps, karmaşık veri yapılarını, algoritmaları ve sistem tasarımı kavramlarını herkes için anlaşılır hale getirmeyi amaçlayan, modern ve etkileşimli bir öğrenme platformudur. 
+AlgoOps, karmaşık veri yapılarını, algoritmaları ve sistem tasarımı kavramlarını herkes için anlaşılır hale getirmeyi amaçlayan, modern ve etkileşimli bir öğrenme platformudur.
 
 Bu projenin temel amacı, teknik mülakatlara hazırlanan yazılımcılar için konuları hem **akademik/profesyonel** derinlikte hem de **basitleştirilmiş (ELI5)** bir dille sunmaktır.
 
 ## 🌟 Özellikler
 
-- **🔄 Çift Uzmanlık Alanı**: 
+- **🔄 Çift Uzmanlık Alanı**:
   - **DSA (Data Structures & Algorithms)**: Temel algoritma ve veri yapıları.
   - **System Design & DB**: Veritabanı mimarileri ve sistem tasarımı prensipleri.
-  
-- **👶 ELI5 (Explain Like I'm 5) Modu**: 
+- **👶 ELI5 (Explain Like I'm 5) Modu**:
   - Tek bir tıkla karmaşık teknik açıklamaları, 5 yaşındaki bir çocuğun anlayabileceği basit metaforlara dönüştürün.
-  
-- **🌍 Çoklu Dil Desteği**: 
+- **🌍 Çoklu Dil Desteği**:
   - Tamamen Türkçe ve İngilizce içerik desteği. Dilediğiniz dilde öğrenin.
 
-- **🎨 Modern ve Şık Arayüz**: 
+- **🎨 Modern ve Şık Arayüz**:
   - Göz yormayan karanlık mod uyumlu tasarım.
   - Akıcı geçişler ve mikro animasyonlar.
 
-- **💻 Kod Örnekleri ve Görselleştirme**: 
+- **💻 Kod Örnekleri ve Görselleştirme**:
   - Konu anlatımlarını destekleyen renklendirilmiş kod blokları.
 
 ## 🛠️ Kullanılan Teknolojiler
@@ -40,12 +38,14 @@ Bu proje, en güncel web teknolojileri kullanılarak geliştirilmiştir:
 Projeyi yerel ortamınızda çalıştırmak için aşağıdaki adımları izleyin:
 
 1. **Repoyu klonlayın:**
+
    ```bash
-   git clone https://github.com/jxpyter/algo-ops.git
-   cd algo-ops
+   git clone https://github.com/lxppyter/argus-panoptes.git
+   cd argus-panoptes
    ```
 
 2. **Bağımlılıkları yükleyin:**
+
    ```bash
    npm install
    # veya
@@ -57,25 +57,12 @@ Projeyi yerel ortamınızda çalıştırmak için aşağıdaki adımları izleyi
    ```
 
 3. **Geliştirme sunucusunu başlatın:**
+
    ```bash
    npm run dev
    ```
 
 4. **Uygulamayı görüntüleyin:**
    Tarayıcınızda [http://localhost:3000](http://localhost:3000) adresine gidin.
-
-## 📂 Proje Yapısı
-
-- `app/`: Next.js App Router sayfaları ve layout dosyaları.
-  - `algorithms/`: Algoritma konu sayfaları.
-  - `data-structures/`: Veri yapıları konu sayfaları.
-  - `patterns/`: Tasarım kalıpları.
-  - `topics/`: Genel konu listelemeleri.
-- `components/`: Tekrar kullanılabilir UI bileşenleri (Button, Card, Input vb.).
-- `context/`: Uygulama geneli durum yönetimi (Dil seçimi, Anlatım modu).
-- `lib/`: Yardımcı fonksiyonlar ve statik içerik verileri (`content.ts`).
-- `public/`: Statik görseller ve dosyalar.
-
----
 
 Bu proje [MIT Lisansı](LICENSE) ile lisanslanmıştır.
