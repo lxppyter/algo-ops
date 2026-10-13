@@ -62,11 +62,6 @@ export function Navbar() {
               <div className="flex justify-between space-x-4">
                 <div className="space-y-1">
                   <h4 className="text-sm font-semibold">LeetCode Plans</h4>
-                  <p className="text-sm text-muted-foreground">
-                    {language === "tr"
-                      ? "Mülakatlar için seçilmiş en iyi listeler."
-                      : "Curated lists for interview prep."}
-                  </p>
                   <div className="flex flex-col gap-2 pt-4">
                     <Link
                       href="https://leetcode.com/studyplan/leetcode-75/"
