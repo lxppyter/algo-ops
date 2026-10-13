@@ -1,4 +1,4 @@
-# Argus Panoptes - Algorithms and System Design Learning Platform
+# Argus Panoptes - Algorithms and Data Structures Learning Platform
 
 Argus Panoptes is a modern, interactive learning platform designed to demystify complex data structures, algorithms, and system design concepts for everyone.
 
@@ -6,74 +6,15 @@ The primary goal of this project is to present topics with both **academic/profe
 
 ## 🌟 Features
 
-- **🔄 Dual Domains**:
   - **DSA (Data Structures & Algorithms)**: Core algorithms and data structures.
 - **👶 ELI5 (Explain Like I'm 5) Mode**:
   - Transform complex technical explanations into simple metaphors understandable by a 5-year-old with a single click.
 - **🌍 Multi-Language Support**:
   - Full content support in both Turkish and English. Learn in your preferred language.
 
-- **🎨 Modern and Sleek Interface**:
-  - Eye-friendly dark mode compatible design.
-  - Smooth transitions and micro-animations.
 
 - **💻 Code Examples & Visualization**:
   - Syntax-highlighted code blocks supporting the topic explanations.
 
-## 🛠️ Tech Stack
-
-This project is built using the latest web technologies:
-
-- **Framework**: [Next.js 16](https://nextjs.org/) (App Router)
-- **Language**: [TypeScript](https://www.typescriptlang.org/)
-- **UI Library**: [React 19](https://react.dev/) & [Radix UI](https://www.radix-ui.com/)
-- **Styling**: [TailwindCSS v4](https://tailwindcss.com/)
-- **Animation**: [Framer Motion](https://www.framer.com/motion/)
-- **Icons**: [Lucide React](https://lucide.dev/)
-- **Code View**: Shiki / React Syntax Highlighter
-
-## 🚀 Installation & Running
-
-Follow these steps to run the project locally:
-
-1. **Clone the repository:**
-
-   ```bash
-   git clone https://github.com/lxppyter/argus-panoptes.git
-   cd argus-panoptes
-   ```
-
-2. **Install dependencies:**
-
-   ```bash
-   npm install
-   # or
-   yarn install
-   # or
-   pnpm install
-   # or
-   bun install
-   ```
-
-3. **Start the development server:**
-
-   ```bash
-   npm run dev
-   ```
-
-4. **View the application:**
-   Open [http://localhost:3000](http://localhost:3000) in your browser.
-
-## 🤝 Contributing
-
-Contributions are welcome! If you find a bug or want to add a new feature, please open an "issue" or submit a "pull request".
-
-1. Fork this project.
-2. Create a new feature branch (`git checkout -b feature/new-feature`).
-3. Commit your changes (`git commit -m 'Added new feature'`).
-4. Push your branch (`git push origin feature/new-feature`).
-5. Create a Pull Request.
-
----
 
 This project is licensed under the [MIT License](LICENSE).
